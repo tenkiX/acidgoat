@@ -1,16 +1,109 @@
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR Könyv Teszt</title>
 
-<model-viewer 
-  src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
-  ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
-  ar 
-  ar-modes="webxr scene-viewer quick-look" 
-  camera-controls 
-  autoplay 
-  shadow-intensity="1"
-  style="width: 100%; height: 500px;">
-  
-  <button slot="ar-button" style="background-color: #008CBA; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold;">
-    Kipróbálás a szobámban (AR)
-  </button>
-</model-viewer>
+  <style>
+    /* =========================================
+       1. ASZTALI NÉZET (768px képernyőszélesség felett)
+       ========================================= */
+    @media (min-width: 768px) {
+      #mobile-ar-container { 
+        display: none !important; /* A nagy mobilos gombot elrejtjük */
+      }
+      #ar-viewer {
+        display: block; /* A 3D modellt mutatjuk */
+        width: 100%;
+        height: 600px;
+      }
+      /* Biztonság kedvéért kikapcsoljuk a model-viewer saját kis AR gombját asztalin */
+      model-viewer::part(default-ar-button) { 
+        display: none; 
+      }
+    }
+
+    /* =========================================
+       2. MOBIL NÉZET (768px képernyőszélesség alatt)
+       ========================================= */
+    @media (max-width: 767px) {
+      #ar-viewer {
+        /* A 3D modellt láthatatlanná tesszük és nullára csökkentjük a méretét.
+           Így nem foglal helyet az oldalon, de a háttérben betölt, hogy az AR azonnal indulhasson! */
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        opacity: 0;
+      }
+      
+      #mobile-ar-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Teljes képernyőmagasságot kitölti */
+        background-color: #f4f4f9; /* Kellemes háttérszín (cseréld bátran) */
+      }
+
+      /* A nagy, középre igazított gomb dizájnja */
+      .big-ar-btn {
+        padding: 24px 48px;
+        font-size: 26px;
+        font-weight: bold;
+        background-color: #008CBA;
+        color: white;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: transform 0.2s; /* Kis animáció kattintáshoz */
+      }
+      
+      .big-ar-btn:active {
+        transform: scale(0.95); /* Lenyomáskor picit összemenjen */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Google Model-Viewer motor betöltése -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <!-- =========================================
+       MOBIL FELÜLET: Csak ez a nagy gomb látszik középen
+       ========================================= -->
+  <div id="mobile-ar-container">
+    <button id="ar-btn" class="big-ar-btn">Kipróbálás (AR)</button>
+  </div>
+
+  <!-- =========================================
+       ASZTALI FELÜLET / AR MOTOR 
+       (Mobilon rejtett, asztalin látható a 3D modell)
+       ========================================= -->
+  <model-viewer 
+    id="ar-viewer"
+    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+    ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
+    ar 
+    ar-modes="webxr scene-viewer quick-look" 
+    camera-controls 
+    autoplay 
+    shadow-intensity="1">
+  </model-viewer>
+
+  <!-- =========================================
+       JAVASCRIPT: A gomb összekötése az AR nézettel
+       ========================================= -->
+  <script>
+    document.getElementById('ar-btn').addEventListener('click', function() {
+      const viewer = document.getElementById('ar-viewer');
+      // Ez a parancs pontosan azt csinálja, mintha a gyári AR gombra nyomtak volna
+      viewer.activateAR(); 
+    });
+  </script>
+
+</body>
+</html>
