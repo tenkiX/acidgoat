@@ -3,108 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv Teszt - Tökéletesített</title>
+  <title>AR Könyv - Natív App Indító</title>
 
   <style>
-    body { margin: 0; padding: 0; }
-    
-    #ar-viewer {
-      width: 100%;
-      background-color: #f4f4f9;
-      position: relative;
+    body { margin: 0; padding: 0; font-family: sans-serif; background-color: #f4f4f9; }
+
+    /* =========================================
+       MOBIL NÉZET: Teljesen letisztult gomb
+       ========================================= */
+    #mobile-ar-view {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    /* A nagy AR gomb stílusa */
-    .big-ar-btn {
+    /* A gomb valójában egy szimpla link, amit gombnak álcázunk */
+    .ar-btn {
+      display: inline-block;
       padding: 24px 48px;
       font-size: 26px;
       font-weight: bold;
       background-color: #008CBA;
       color: white;
-      border: none;
+      text-decoration: none;
       border-radius: 16px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      cursor: pointer;
       text-transform: uppercase;
+      text-align: center;
     }
+    
+    .ar-btn:active { transform: scale(0.95); }
 
     /* =========================================
-       MOBIL NÉZET: Nincs 3D modell, csak a gomb
+       ASZTALI NÉZET: Itt jelenik csak meg a 3D
        ========================================= */
-    @media (max-width: 767px) {
-      #ar-viewer {
-        height: 100vh; /* Teljes képernyőt kitölti */
-      }
-      
-      /* EZ A TRÜKK: Magát a 3D modellt elrejtjük a háttérből! */
-      #ar-viewer::part(default-canvas) {
-        visibility: hidden;
-      }
-
-      /* A gombot a képernyő mértani közepére tesszük */
-      .big-ar-btn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      
-      .big-ar-btn:active {
-        transform: translate(-50%, -50%) scale(0.95);
-      }
+    #desktop-3d-view {
+      display: none; /* Mobilon ezt fizikailag eltávolítjuk a képről */
+      width: 100%;
+      height: 600px;
     }
 
-    /* =========================================
-       ASZTALI NÉZET: Van 3D modell, nincs gomb
-       ========================================= */
     @media (min-width: 768px) {
-      #ar-viewer {
-        height: 600px;
-      }
-      
-      /* Asztalin újra látható a 3D modell */
-      #ar-viewer::part(default-canvas) {
-        visibility: visible;
-      }
-
-      /* Asztalin teljesen elrejtjük az AR gombot */
-      .big-ar-btn {
-        display: none !important;
-      }
-      
-      /* Biztonsági kikapcsolás a gyári ikonra */
-      model-viewer::part(default-ar-button) { 
-        display: none; 
-      }
+      #mobile-ar-view { display: none; } /* Asztalin eltűnik a gomb */
+      #desktop-3d-view { display: block; } /* Asztalin megjelenik a forgatható modell */
     }
   </style>
 </head>
 <body>
 
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <!-- MOBILON KIZÁRÓLAG EZ LÉTEZIK (Nincs 3D canvas a háttérben!) -->
+  <div id="mobile-ar-view">
+    <a id="ar-link" href="#" class="ar-btn">Kipróbálás (AR)</a>
+  </div>
 
-  <!-- 
-    ar-modes="scene-viewer quick-look" 
-    Kivettük a "webxr"-t, így a stabil Google app nyílik meg, 
-    nincs többé 1 méteres repülés!
-  -->
-  <model-viewer 
-    id="ar-viewer"
-    src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
-    ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
-    ar 
-    ar-modes="scene-viewer quick-look" 
-    camera-controls 
-    autoplay 
-    animation-name="Dance"
-    shadow-intensity="1">
-    
-    <!-- Ez a natív gomb első kattintásra működik -->
-    <button slot="ar-button" class="big-ar-btn">
-      Kipróbálás (AR)
-    </button>
+  <!-- ASZTALIN KIZÁRÓLAG EZ LÉTEZIK -->
+  <div id="desktop-3d-view">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <model-viewer 
+      src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
+      camera-controls autoplay animation-name="Dance" shadow-intensity="1"
+      style="width: 100%; height: 100%;">
+    </model-viewer>
+  </div>
 
-  </model-viewer>
+  <!-- JAVASCRIPT: Közvetlenül az OpRendszert hívja meg mobilon -->
+  <script>
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const arLink = document.getElementById('ar-link');
+
+    const glbUrl = "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb";
+    const usdzUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.usdz";
+
+    // 1. Ha a telefon iOS (iPhone / iPad)
+    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+      arLink.href = usdzUrl;
+      arLink.setAttribute("rel", "ar");
+      // Az Apple megköveteli egy üres kép jelenlétét a gombon belül az AR indításához
+      arLink.innerHTML = "<img src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' style='display:none;' />Kipróbálás (AR)";
+    } 
+    // 2. Ha a telefon Android
+    else {
+      // A mode=ar_only garantálja, hogy NE a böngészős forgatást nyissa meg. Csak a kamera!
+      const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+      arLink.href = intentUrl;
+    }
+  </script>
 
 </body>
 </html>
