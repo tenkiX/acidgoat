@@ -1,17 +1,16 @@
-<!-- Google Model-Viewer könyvtár betöltése -->
 <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-<!-- A 3D AR megjelenítő -->
 <model-viewer 
-  src="animalt_konyv_modellek.glb" 
-  ios-src="animalt_konyv_modellek.usdz"
+  src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+  ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
   ar 
   ar-modes="webxr scene-viewer quick-look" 
   camera-controls 
   autoplay 
-  shadow-intensity="1">
+  shadow-intensity="1"
+  style="width: 100%; height: 500px;">
   
-  <button slot="ar-button" style="background-color: #008CBA; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
+  <button slot="ar-button" style="background-color: #008CBA; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold;">
     Kipróbálás a szobámban (AR)
   </button>
 </model-viewer>
