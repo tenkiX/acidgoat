@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv - Natív App Indító</title>
+  <title>AR Könyv - Interaktív Teszt</title>
 
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; background-color: #f4f4f9; }
@@ -39,25 +39,25 @@
        ASZTALI NÉZET: Itt jelenik csak meg a 3D
        ========================================= */
     #desktop-3d-view {
-      display: none; /* Mobilon ezt fizikailag eltávolítjuk a képről */
+      display: none; /* Mobilon eltávolítjuk */
       width: 100%;
       height: 600px;
     }
 
     @media (min-width: 768px) {
-      #mobile-ar-view { display: none; } /* Asztalin eltűnik a gomb */
-      #desktop-3d-view { display: block; } /* Asztalin megjelenik a forgatható modell */
+      #mobile-ar-view { display: none; }
+      #desktop-3d-view { display: block; }
     }
   </style>
 </head>
 <body>
 
-  <!-- MOBILON KIZÁRÓLAG EZ LÉTEZIK (Nincs 3D canvas a háttérben!) -->
+  <!-- MOBILON: Nincs 3D canvas a háttérben! -->
   <div id="mobile-ar-view">
     <a id="ar-link" href="#" class="ar-btn">Kipróbálás (AR)</a>
   </div>
 
-  <!-- ASZTALIN KIZÁRÓLAG EZ LÉTEZIK -->
+  <!-- ASZTALIN: Forgatható 3D (Google Robot) -->
   <div id="desktop-3d-view">
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <model-viewer 
@@ -67,24 +67,27 @@
     </model-viewer>
   </div>
 
-  <!-- JAVASCRIPT: Közvetlenül az OpRendszert hívja meg mobilon -->
+  <!-- JAVASCRIPT: AR Motorok Indítása -->
   <script>
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const arLink = document.getElementById('ar-link');
 
+    // Android/Asztali fallback (ide tedd majd a saját .glb fájlod linkjét)
     const glbUrl = "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb";
-    const usdzUrl = "https://modelviewer.dev/shared-assets/models/Astronaut.usdz";
+    
+    // AZ APPLE INTERAKTÍV FÁJL (ugyanabban a mappában kell lennie, mint a html-nek!)
+    const realityUrl = "CosmonautSuit_en.reality";
 
     // 1. Ha a telefon iOS (iPhone / iPad)
     if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-      arLink.href = usdzUrl;
+      arLink.href = realityUrl;
       arLink.setAttribute("rel", "ar");
-      // Az Apple megköveteli egy üres kép jelenlétét a gombon belül az AR indításához
+      // Az Apple kötelező trükkje az AR indításához egy egyedi gombról
       arLink.innerHTML = "<img src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' style='display:none;' />Kipróbálás (AR)";
     } 
     // 2. Ha a telefon Android
     else {
-      // A mode=ar_only garantálja, hogy NE a böngészős forgatást nyissa meg. Csak a kamera!
+      // Androidon marad a biztonságos, dedikált Scene Viewer indítás
       const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
       arLink.href = intentUrl;
     }
