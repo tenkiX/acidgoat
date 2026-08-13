@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv - Stabil iOS</title>
+  <title>AR Könyv - Csak Apple AR</title>
 
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; background-color: #f4f4f9; }
 
-    /* =========================================
-       MOBIL NÉZET
-       ========================================= */
-    #mobile-ar-view {
+    /* A gombot minden eszközön középre zárjuk */
+    #ar-view-container {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,7 +18,7 @@
 
     /* A Gomb stílusa */
     .ar-btn {
-      position: relative; /* KÖTELEZŐ a láthatatlan kép miatt */
+      position: relative;
       display: inline-block;
       padding: 24px 48px;
       font-size: 26px;
@@ -37,8 +35,7 @@
     
     .ar-btn:active { transform: scale(0.95); }
 
-    /* EZ OLDJA MEG AZ APPLE ÖSSZEOMLÁST!
-       Egy kép, aminek van fizikai mérete, de teljesen átlátszó. */
+    /* Az Apple "láthatatlan kép" trükkje az összeomlás ellen */
     .apple-ar-img {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -50,70 +47,22 @@
       position: relative;
       z-index: 2;
     }
-
-    /* =========================================
-       ASZTALI NÉZET
-       ========================================= */
-    #desktop-3d-view {
-      width: 100%;
-      height: 600px;
-      display: none;
-    }
-
-    @media (min-width: 768px) {
-      #mobile-ar-view { display: none; }
-      #desktop-3d-view { display: block; }
-    }
   </style>
 </head>
 <body>
 
-  <!-- MOBIL KONTÉNER -->
-  <div id="mobile-ar-view">
-    <!-- Az AR link, benne a kötelező trükkös képpel -->
-    <a id="ar-link" href="#" class="ar-btn">
+  <div id="ar-view-container">
+    
+    <!-- 
+      Közvetlenül a HTML-be írjuk a linket (href) 
+      és a rel="ar" paramétert, ami aktiválja az Apple AR-t 
+    -->
+    <a href="https://developer.apple.com/quick-look-gallery/models/cosmonaut/CosmonautSuit_en.reality" rel="ar" class="ar-btn">
       <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="apple-ar-img" alt="AR Indító" />
       <span class="btn-text">Kipróbálás (AR)</span>
     </a>
+
   </div>
-
-  <!-- ASZTALI KONTÉNER (Csak gépen fut le) -->
-  <div id="desktop-3d-view"></div>
-
-  <script>
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
-    const arLink = document.getElementById('ar-link');
-
-    // 1. ASZTALI GÉP (Betöltjük a 3D nézőkét gomb nélkül)
-    if (!isMobile) {
-      const desktopView = document.getElementById('desktop-3d-view');
-      desktopView.innerHTML = `
-        <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"><\/script>
-        <model-viewer 
-          src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
-          camera-controls autoplay shadow-intensity="1"
-          style="width: 100%; height: 100%;">
-        </model-viewer>
-      `;
-    } 
-    // 2. MOBIL 
-    else {
-      const realityUrl = "https://developer.apple.com/quick-look-gallery/models/cosmonaut/CosmonautSuit_en.reality";
-      const glbUrl = "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb";
-
-      // Ha iOS
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        arLink.href = realityUrl;
-        arLink.setAttribute("rel", "ar");
-        // Nem nyúlunk bele JS-ből a gomb HTML-jébe, mindent a CSS intéz!
-      } 
-      // Ha Android
-      else {
-        arLink.href = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
-      }
-    }
-  </script>
 
 </body>
 </html>
