@@ -3,67 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv Teszt - Animált</title>
+  <title>AR Könyv Teszt - Stabil</title>
 
   <style>
-    /* =========================================
-       1. ASZTALI NÉZET (768px képernyőszélesség felett)
-       ========================================= */
+    /* A 3D nézőke beállítása: mobilon és asztalin is látszik */
+    #ar-viewer {
+      width: 100%;
+      height: 100vh; /* Mobilon kitölti a teljes képernyőt */
+      background-color: #f4f4f9;
+    }
+
     @media (min-width: 768px) {
-      #mobile-ar-container { 
-        display: none !important; /* A nagy mobilos gombot elrejtjük */
-      }
       #ar-viewer {
-        display: block; /* A 3D modellt mutatjuk */
-        width: 100%;
-        height: 600px;
-        background-color: #f4f4f9;
-      }
-      /* Kikapcsoljuk a model-viewer saját kis AR gombját asztalin */
-      model-viewer::part(default-ar-button) { 
-        display: none; 
+        height: 600px; /* Asztali gépen kisebb dobozban jelenik meg */
       }
     }
 
-    /* =========================================
-       2. MOBIL NÉZET (768px képernyőszélesség alatt)
-       ========================================= */
-    @media (max-width: 767px) {
-      #ar-viewer {
-        /* A 3D modellt rejtjük, de a háttérben betöltjük az AR-hez */
-        position: absolute;
-        width: 0;
-        height: 0;
-        overflow: hidden;
-        opacity: 0;
-      }
+    /* A saját, lebegő AR gombunk dizájnja */
+    .my-custom-ar-button {
+      position: absolute; /* A 3D modell "fölé" lebegtetjük */
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%); /* Középre zárás */
       
-      #mobile-ar-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f4f4f9;
-      }
+      padding: 18px 36px;
+      font-size: 22px;
+      font-weight: bold;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
 
-      /* A nagy, középre igazított gomb dizájnja */
-      .big-ar-btn {
-        padding: 24px 48px;
-        font-size: 26px;
-        font-weight: bold;
-        background-color: #008CBA;
-        color: white;
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        cursor: pointer;
-        text-transform: uppercase;
-        transition: transform 0.2s;
-      }
-      
-      .big-ar-btn:active {
-        transform: scale(0.95);
-      }
+    /* Kattintási effekt */
+    .my-custom-ar-button:active {
+      background-color: #007399;
+      transform: translateX(-50%) scale(0.95);
     }
   </style>
 </head>
@@ -72,40 +49,25 @@
   <!-- Google Model-Viewer motor betöltése -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- =========================================
-       MOBIL FELÜLET: Csak ez a nagy gomb látszik középen
-       ========================================= -->
-  <div id="mobile-ar-container">
-    <button id="ar-btn" class="big-ar-btn">Kipróbálás (AR)</button>
-  </div>
-
-  <!-- =========================================
-       ASZTALI FELÜLET / AR MOTOR 
-       ========================================= -->
- <model-viewer 
+  <!-- A 3D AR Megjelenítő -->
+  <model-viewer 
     id="ar-viewer"
     src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
     ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
     ar 
-    ar-modes="scene-viewer webxr quick-look" 
+    ar-modes="webxr scene-viewer quick-look" 
     ar-placement="floor"
-    ar-scale="auto"
+    disable-tap
     camera-controls 
     autoplay 
     animation-name="Dance"
     shadow-intensity="1">
+    
+    <!-- A gomb, ami csak AR-képes telefonokon jelenik meg -->
+    <button slot="ar-button" class="my-custom-ar-button">
+      Kipróbálás (AR)
+    </button>
   </model-viewer>
-
-  <!-- =========================================
-       JAVASCRIPT: A gomb összekötése az AR nézettel
-       ========================================= -->
-  <script>
-    document.getElementById('ar-btn').addEventListener('click', function() {
-      const viewer = document.getElementById('ar-viewer');
-      // Megnyitja az AR kamerát mobilon
-      viewer.activateAR(); 
-    });
-  </script>
 
 </body>
 </html>
