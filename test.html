@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv - Interaktív Teszt</title>
+  <title>AR Könyv - Stabil iOS</title>
 
   <style>
     body { margin: 0; padding: 0; font-family: sans-serif; background-color: #f4f4f9; }
 
     /* =========================================
-       MOBIL NÉZET: Teljesen letisztult gomb
+       ALAPÉRTELMEZETT (MOBIL) NÉZET: Csak a gomb
        ========================================= */
     #mobile-ar-view {
       display: flex;
@@ -18,7 +18,6 @@
       height: 100vh;
     }
 
-    /* A gomb valójában egy szimpla link, amit gombnak álcázunk */
     .ar-btn {
       display: inline-block;
       padding: 24px 48px;
@@ -35,13 +34,11 @@
     
     .ar-btn:active { transform: scale(0.95); }
 
-    /* =========================================
-       ASZTALI NÉZET: Itt jelenik csak meg a 3D
-       ========================================= */
+    /* Az asztali nézet doboza üresen indul */
     #desktop-3d-view {
-      display: none; /* Mobilon eltávolítjuk */
       width: 100%;
       height: 600px;
+      display: none;
     }
 
     @media (min-width: 768px) {
@@ -52,44 +49,50 @@
 </head>
 <body>
 
-  <!-- MOBILON: Nincs 3D canvas a háttérben! -->
+  <!-- MOBIL KONTÉNER -->
   <div id="mobile-ar-view">
     <a id="ar-link" href="#" class="ar-btn">Kipróbálás (AR)</a>
   </div>
 
-  <!-- ASZTALIN: Forgatható 3D (Google Robot) -->
-  <div id="desktop-3d-view">
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
-    <model-viewer 
-      src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
-      camera-controls autoplay animation-name="Dance" shadow-intensity="1"
-      style="width: 100%; height: 100%;">
-    </model-viewer>
-  </div>
+  <!-- ASZTALI KONTÉNER (Üres, amíg a JS fel nem tölti) -->
+  <div id="desktop-3d-view"></div>
 
-  <!-- JAVASCRIPT: AR Motorok Indítása -->
   <script>
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
+    
     const arLink = document.getElementById('ar-link');
 
-    // Android/Asztali fallback (ide tedd majd a saját .glb fájlod linkjét)
-    const glbUrl = "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb";
-    
-    // AZ APPLE INTERAKTÍV FÁJL (ugyanabban a mappában kell lennie, mint a html-nek!)
-    const realityUrl = "https://developer.apple.com/augmented-reality/quick-look/models/cosmonaut/CosmonautSuit_en.reality";
-
-    // 1. Ha a telefon iOS (iPhone / iPad)
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-      arLink.href = realityUrl;
-      arLink.setAttribute("rel", "ar");
-      // Az Apple kötelező trükkje az AR indításához egy egyedi gombról
-      arLink.innerHTML = "<img src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' style='display:none;' />Kipróbálás (AR)";
+    // 1. HA ASZTALI GÉP (Betöltjük a 3D nézőkét)
+    if (!isMobile) {
+      const desktopView = document.getElementById('desktop-3d-view');
+      desktopView.innerHTML = `
+        <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"><\/script>
+        <model-viewer 
+          src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
+          camera-controls autoplay shadow-intensity="1"
+          style="width: 100%; height: 100%;">
+        </model-viewer>
+      `;
     } 
-    // 2. Ha a telefon Android
+    
+    // 2. HA MOBIL (Gomb beállítása)
     else {
-      // Androidon marad a biztonságos, dedikált Scene Viewer indítás
-      const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
-      arLink.href = intentUrl;
+      // Itt használd az Apple linkjét a biztonság kedvéért a teszthez
+      const realityUrl = "https://developer.apple.com/augmented-reality/quick-look/models/cosmonaut/CosmonautSuit_en.reality";
+      const glbUrl = "https://modelviewer.dev/shared-assets/models/RobotExpressive.glb";
+
+      // iOS
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        arLink.href = realityUrl;
+        arLink.setAttribute("rel", "ar");
+        arLink.innerHTML = "<img src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' style='display:none;' />Kipróbálás (AR)";
+      } 
+      // Android
+      else {
+        const intentUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${glbUrl}&mode=ar_only#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;end;`;
+        arLink.href = intentUrl;
+      }
     }
   </script>
 
