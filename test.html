@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv Teszt</title>
+  <title>AR Könyv Teszt - Animált</title>
 
   <style>
     /* =========================================
@@ -17,8 +17,9 @@
         display: block; /* A 3D modellt mutatjuk */
         width: 100%;
         height: 600px;
+        background-color: #f4f4f9;
       }
-      /* Biztonság kedvéért kikapcsoljuk a model-viewer saját kis AR gombját asztalin */
+      /* Kikapcsoljuk a model-viewer saját kis AR gombját asztalin */
       model-viewer::part(default-ar-button) { 
         display: none; 
       }
@@ -29,8 +30,7 @@
        ========================================= */
     @media (max-width: 767px) {
       #ar-viewer {
-        /* A 3D modellt láthatatlanná tesszük és nullára csökkentjük a méretét.
-           Így nem foglal helyet az oldalon, de a háttérben betölt, hogy az AR azonnal indulhasson! */
+        /* A 3D modellt rejtjük, de a háttérben betöltjük az AR-hez */
         position: absolute;
         width: 0;
         height: 0;
@@ -42,8 +42,8 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh; /* Teljes képernyőmagasságot kitölti */
-        background-color: #f4f4f9; /* Kellemes háttérszín (cseréld bátran) */
+        height: 100vh;
+        background-color: #f4f4f9;
       }
 
       /* A nagy, középre igazított gomb dizájnja */
@@ -58,11 +58,11 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         cursor: pointer;
         text-transform: uppercase;
-        transition: transform 0.2s; /* Kis animáció kattintáshoz */
+        transition: transform 0.2s;
       }
       
       .big-ar-btn:active {
-        transform: scale(0.95); /* Lenyomáskor picit összemenjen */
+        transform: scale(0.95);
       }
     }
   </style>
@@ -81,16 +81,16 @@
 
   <!-- =========================================
        ASZTALI FELÜLET / AR MOTOR 
-       (Mobilon rejtett, asztalin látható a 3D modell)
        ========================================= -->
   <model-viewer 
     id="ar-viewer"
-    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+    src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
     ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
     ar 
     ar-modes="webxr scene-viewer quick-look" 
     camera-controls 
     autoplay 
+    animation-name="Dance"
     shadow-intensity="1">
   </model-viewer>
 
@@ -100,7 +100,7 @@
   <script>
     document.getElementById('ar-btn').addEventListener('click', function() {
       const viewer = document.getElementById('ar-viewer');
-      // Ez a parancs pontosan azt csinálja, mintha a gyári AR gombra nyomtak volna
+      // Megnyitja az AR kamerát mobilon
       viewer.activateAR(); 
     });
   </script>
