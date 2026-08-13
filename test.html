@@ -3,70 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Könyv Teszt - Stabil</title>
+  <title>AR Könyv Teszt - Tökéletesített</title>
 
   <style>
-    /* A 3D nézőke beállítása: mobilon és asztalin is látszik */
+    body { margin: 0; padding: 0; }
+    
     #ar-viewer {
       width: 100%;
-      height: 100vh; /* Mobilon kitölti a teljes képernyőt */
       background-color: #f4f4f9;
+      position: relative;
     }
 
-    @media (min-width: 768px) {
-      #ar-viewer {
-        height: 600px; /* Asztali gépen kisebb dobozban jelenik meg */
-      }
-    }
-
-    /* A saját, lebegő AR gombunk dizájnja */
-    .my-custom-ar-button {
-      position: absolute; /* A 3D modell "fölé" lebegtetjük */
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%); /* Középre zárás */
-      
-      padding: 18px 36px;
-      font-size: 22px;
+    /* A nagy AR gomb stílusa */
+    .big-ar-btn {
+      padding: 24px 48px;
+      font-size: 26px;
       font-weight: bold;
       background-color: #008CBA;
       color: white;
       border: none;
-      border-radius: 12px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
       cursor: pointer;
+      text-transform: uppercase;
     }
 
-    /* Kattintási effekt */
-    .my-custom-ar-button:active {
-      background-color: #007399;
-      transform: translateX(-50%) scale(0.95);
+    /* =========================================
+       MOBIL NÉZET: Nincs 3D modell, csak a gomb
+       ========================================= */
+    @media (max-width: 767px) {
+      #ar-viewer {
+        height: 100vh; /* Teljes képernyőt kitölti */
+      }
+      
+      /* EZ A TRÜKK: Magát a 3D modellt elrejtjük a háttérből! */
+      #ar-viewer::part(default-canvas) {
+        visibility: hidden;
+      }
+
+      /* A gombot a képernyő mértani közepére tesszük */
+      .big-ar-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      
+      .big-ar-btn:active {
+        transform: translate(-50%, -50%) scale(0.95);
+      }
+    }
+
+    /* =========================================
+       ASZTALI NÉZET: Van 3D modell, nincs gomb
+       ========================================= */
+    @media (min-width: 768px) {
+      #ar-viewer {
+        height: 600px;
+      }
+      
+      /* Asztalin újra látható a 3D modell */
+      #ar-viewer::part(default-canvas) {
+        visibility: visible;
+      }
+
+      /* Asztalin teljesen elrejtjük az AR gombot */
+      .big-ar-btn {
+        display: none !important;
+      }
+      
+      /* Biztonsági kikapcsolás a gyári ikonra */
+      model-viewer::part(default-ar-button) { 
+        display: none; 
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Google Model-Viewer motor betöltése -->
   <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
-  <!-- A 3D AR Megjelenítő -->
+  <!-- 
+    ar-modes="scene-viewer quick-look" 
+    Kivettük a "webxr"-t, így a stabil Google app nyílik meg, 
+    nincs többé 1 méteres repülés!
+  -->
   <model-viewer 
     id="ar-viewer"
     src="https://modelviewer.dev/shared-assets/models/RobotExpressive.glb" 
     ios-src="https://modelviewer.dev/shared-assets/models/Astronaut.usdz"
     ar 
-    ar-modes="webxr scene-viewer quick-look" 
-    ar-placement="floor"
-    disable-tap
+    ar-modes="scene-viewer quick-look" 
     camera-controls 
     autoplay 
     animation-name="Dance"
     shadow-intensity="1">
     
-    <!-- A gomb, ami csak AR-képes telefonokon jelenik meg -->
-    <button slot="ar-button" class="my-custom-ar-button">
+    <!-- Ez a natív gomb első kattintásra működik -->
+    <button slot="ar-button" class="big-ar-btn">
       Kipróbálás (AR)
     </button>
+
   </model-viewer>
 
 </body>
