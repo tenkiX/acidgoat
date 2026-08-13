@@ -1,0 +1,17 @@
+<!-- Google Model-Viewer könyvtár betöltése -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+<!-- A 3D AR megjelenítő -->
+<model-viewer 
+  src="animalt_konyv_modellek.glb" 
+  ios-src="animalt_konyv_modellek.usdz"
+  ar 
+  ar-modes="webxr scene-viewer quick-look" 
+  camera-controls 
+  autoplay 
+  shadow-intensity="1">
+  
+  <button slot="ar-button" style="background-color: #008CBA; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
+    Kipróbálás a szobámban (AR)
+  </button>
+</model-viewer>
