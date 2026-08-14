@@ -49,33 +49,21 @@
 <body>
 
   <div id="ar-view-container">
-    
-    <!-- 
-      A LINKBEN VAN A MÁGIA! 
-      A fájl neve után a # jellel kezdve paramétereket adunk át az Apple kamerájának.
-      (A szóközöket %20-szal kell írni a linkek szabályai miatt)
-    -->
     <a id="ar-link" 
-       href="https://developer.apple.com/quick-look-gallery/models/cosmonaut/CosmonautSuit_en.reality#checkoutTitle=Kiterjesztett%20Valóság%20Könyv&checkoutSubtitle=Multilearn%20Kft.&price=4990%20Ft&callToAction=Vásárlás" 
+       href="test.usdz#checkoutTitle=Kiterjesztett%20Valóság%20Könyv&checkoutSubtitle=Multilearn%20Kft.&price=4990%20Ft&callToAction=Vásárlás" 
        rel="ar" 
        class="ar-btn">
       <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="apple-ar-img" alt="AR Indító" />
       <span class="btn-text">Kipróbálás (AR)</span>
     </a>
-
   </div>
 
   <script>
-    // EZ A KIS KÓD KAPJA EL A GOMBNYOMÁST AZ AR-BŐL
     const arLink = document.getElementById('ar-link');
 
     arLink.addEventListener('message', function (event) {
-      // Ha a visszajövő üzenet az, hogy a gombot megnyomták:
       if (event.data === '_apple_ar_quicklook_button_tapped') {
-        
-        // Itt át is irányítjuk a saját webshopod pénztárához! 
         window.location.href = "https://shop.arbookslibrary.com/az_emberi_test_kiterjesztett_valosag_konyv";
-        
       }
     });
   </script>
